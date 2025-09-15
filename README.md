@@ -2,6 +2,9 @@
 
 **Professional Reddit monitoring and AI-powered lead qualification system built with n8n workflows.**
 
+## 🎬 **Video Demonstration**
+**Watch the complete system walkthrough and demo**: [GTM Automation System Demo](https://youtu.be/E3kZ08f4K3A)
+
 ## ⚠️ **Demo Credentials Notice**
 **This repository contains live API credentials for demonstration purposes only. These credentials will be removed immediately after the demo presentation. In production, all sensitive credentials should be stored securely using environment variables and never committed to version control.**
 

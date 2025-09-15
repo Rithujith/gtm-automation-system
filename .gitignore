@@ -45,5 +45,11 @@ Thumbs.db
 *.bak
 *.tmp
 
+# Video files (too large for GitHub)
+*.mp4
+*.mov
+*.avi
+*.mkv
+
 # Docker Compose override
 docker-compose.override.yml
