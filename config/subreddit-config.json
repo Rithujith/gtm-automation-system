@@ -1,0 +1,136 @@
+{
+  "subreddits": {
+    "entrepreneur": {
+      "name": "r/entrepreneur",
+      "priority": "high",
+      "check_frequency": 15,
+      "max_posts_per_check": 25,
+      "keywords_weight_multiplier": 1.2,
+      "engagement_style": "professional",
+      "typical_audience": "business_owners",
+      "response_tone": "helpful_expert"
+    },
+    "smallbusiness": {
+      "name": "r/smallbusiness", 
+      "priority": "high",
+      "check_frequency": 15,
+      "max_posts_per_check": 20,
+      "keywords_weight_multiplier": 1.1,
+      "engagement_style": "supportive",
+      "typical_audience": "small_business_owners",
+      "response_tone": "friendly_advisor"
+    },
+    "shopify": {
+      "name": "r/shopify",
+      "priority": "very_high",
+      "check_frequency": 10,
+      "max_posts_per_check": 30,
+      "keywords_weight_multiplier": 1.5,
+      "engagement_style": "technical_helpful",
+      "typical_audience": "ecommerce_owners",
+      "response_tone": "technical_expert"
+    },
+    "ecommerce": {
+      "name": "r/ecommerce",
+      "priority": "high",
+      "check_frequency": 15,
+      "max_posts_per_check": 25,
+      "keywords_weight_multiplier": 1.3,
+      "engagement_style": "strategic",
+      "typical_audience": "ecommerce_professionals",
+      "response_tone": "strategic_advisor"
+    },
+    "marketing": {
+      "name": "r/marketing",
+      "priority": "medium",
+      "check_frequency": 20,
+      "max_posts_per_check": 20,
+      "keywords_weight_multiplier": 1.0,
+      "engagement_style": "professional",
+      "typical_audience": "marketers",
+      "response_tone": "peer_expert"
+    },
+    "digitalmarketing": {
+      "name": "r/digitalmarketing",
+      "priority": "medium",
+      "check_frequency": 20,
+      "max_posts_per_check": 15,
+      "keywords_weight_multiplier": 0.9,
+      "engagement_style": "technical",
+      "typical_audience": "digital_marketers",
+      "response_tone": "technical_peer"
+    },
+    "startups": {
+      "name": "r/startups",
+      "priority": "medium",
+      "check_frequency": 25,
+      "max_posts_per_check": 15,
+      "keywords_weight_multiplier": 1.0,
+      "engagement_style": "strategic",
+      "typical_audience": "startup_founders",
+      "response_tone": "mentor"
+    },
+    "saas": {
+      "name": "r/saas",
+      "priority": "high",
+      "check_frequency": 15,
+      "max_posts_per_check": 20,
+      "keywords_weight_multiplier": 1.4,
+      "engagement_style": "technical_strategic",
+      "typical_audience": "saas_founders",
+      "response_tone": "industry_expert"
+    },
+    "customerservice": {
+      "name": "r/customerservice",
+      "priority": "medium",
+      "check_frequency": 30,
+      "max_posts_per_check": 10,
+      "keywords_weight_multiplier": 0.8,
+      "engagement_style": "supportive",
+      "typical_audience": "cs_professionals",
+      "response_tone": "helpful_professional"
+    },
+    "business": {
+      "name": "r/business",
+      "priority": "low",
+      "check_frequency": 30,
+      "max_posts_per_check": 15,
+      "keywords_weight_multiplier": 0.7,
+      "engagement_style": "formal",
+      "typical_audience": "business_professionals",
+      "response_tone": "corporate_advisor"
+    }
+  },
+  "global_settings": {
+    "max_daily_engagements": 50,
+    "cool_down_period_hours": 2,
+    "max_engagements_per_subreddit_daily": 10,
+    "avoid_recent_posts_minutes": 5,
+    "require_minimum_karma": false,
+    "minimum_account_age_days": 0
+  },
+  "time_based_adjustments": {
+    "peak_hours": [9, 10, 11, 13, 14, 15, 16, 17],
+    "off_peak_multiplier": 0.8,
+    "weekend_multiplier": 0.6,
+    "timezone": "UTC"
+  },
+  "content_filters": {
+    "exclude_flairs": [
+      "spam",
+      "removed",
+      "deleted", 
+      "meta",
+      "announcement"
+    ],
+    "preferred_flairs": [
+      "question",
+      "help",
+      "advice",
+      "discussion",
+      "strategy"
+    ],
+    "min_post_length": 50,
+    "max_post_length": 5000
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "application": {
+    "name": "GTM Automation System",
+    "version": "1.0.0",
+    "environment": "production",
+    "timezone": "UTC",
+    "log_level": "info"
+  },
+  "monitoring": {
+    "health_check_interval": 300,
+    "performance_tracking": true,
+    "error_reporting": true,
+    "metrics_collection": true,
+    "uptime_monitoring": true
+  },
+  "rate_limiting": {
+    "reddit_api": {
+      "requests_per_minute": 60,
+      "burst_limit": 10,
+      "cool_down_period": 60
+    },
+    "openai_api": {
+      "requests_per_minute": 20,
+      "requests_per_day": 2000,
+      "token_limit_per_minute": 150000
+    },
+    "google_sheets_api": {
+      "requests_per_minute": 40,
+      "requests_per_day": 5000
+    },
+    "slack_api": {
+      "requests_per_minute": 30,
+      "requests_per_day": 1000
+    }
+  },
+  "data_management": {
+    "retention_policy": {
+      "raw_posts": 90,
+      "processed_data": 180,
+      "logs": 30,
+      "analytics": 365
+    },
+    "backup_schedule": {
+      "frequency": "daily",
+      "time": "02:00",
+      "retention_days": 30,
+      "include_logs": false
+    },
+    "cleanup_schedule": {
+      "frequency": "weekly", 
+      "day": "sunday",
+      "time": "03:00"
+    }
+  },
+  "notification_settings": {
+    "slack": {
+      "enabled": true,
+      "channels": {
+        "alerts": "#gtm-alerts",
+        "reports": "#gtm-reports",
+        "errors": "#gtm-errors"
+      },
+      "priority_thresholds": {
+        "high": 80,
+        "medium": 60,
+        "low": 40
+      }
+    },
+    "email": {
+      "enabled": false,
+      "daily_summary": true,
+      "error_alerts": true,
+      "weekly_reports": true
+    }
+  },
+  "workflow_settings": {
+    "max_concurrent_executions": 5,
+    "execution_timeout": 1800,
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff_strategy": "exponential",
+      "base_delay": 5
+    },
+    "queue_settings": {
+      "max_jobs": 1000,
+      "job_timeout": 300,
+      "cleanup_interval": 3600
+    }
+  },
+  "security": {
+    "api_key_rotation": {
+      "enabled": false,
+      "interval_days": 90
+    },
+    "access_logging": true,
+    "request_validation": true,
+    "rate_limit_enforcement": true,
+    "webhook_verification": true
+  },
+  "features": {
+    "ai_classification": {
+      "enabled": true,
+      "confidence_threshold": 70,
+      "fallback_classification": true
+    },
+    "engagement_generation": {
+      "enabled": true,
+      "auto_approve_threshold": 85,
+      "manual_review_threshold": 70
+    },
+    "analytics": {
+      "enabled": true,
+      "real_time_tracking": true,
+      "trend_analysis": true,
+      "performance_metrics": true
+    },
+    "linkedin_monitoring": {
+      "enabled": false,
+      "check_interval": 60
+    }
+  },
+  "integration_settings": {
+    "google_sheets": {
+      "auto_format": true,
+      "duplicate_detection": true,
+      "batch_size": 10,
+      "update_frequency": 300
+    },
+    "reddit": {
+      "respect_rate_limits": true,
+      "user_agent_rotation": false,
+      "proxy_rotation": false,
+      "oauth_refresh_threshold": 3600
+    },
+    "openai": {
+      "model_failover": true,
+      "response_caching": true,
+      "cost_tracking": true,
+      "usage_monitoring": true
+    }
+  }
+}

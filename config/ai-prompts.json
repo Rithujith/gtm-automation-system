@@ -1,0 +1,92 @@
+{
+  "classification_prompt": {
+    "system_prompt": "You are an expert GTM (Go-To-Market) analyst specializing in customer retention and ecommerce growth. Your job is to analyze social media posts and classify them for business development opportunities.",
+    "user_prompt_template": "Analyze this Reddit post for GTM relevance:\n\nTitle: {title}\nContent: {content}\nSubreddit: {subreddit}\nUpvotes: {upvotes}\nComments: {comment_count}\n\nProvide a JSON response with:\n1. relevance_score (0-100): How relevant is this to customer retention, churn reduction, or ecommerce growth?\n2. intent_classification: 'question', 'complaint', 'vendor_search', 'discussion', 'showcase', or 'other'\n3. sentiment: 'positive', 'negative', 'neutral', or 'frustrated'\n4. business_context: Brief description of the business problem or opportunity\n5. engagement_recommendation: 'direct_reply', 'direct_message', 'monitor', or 'skip'\n6. priority_level: 'high', 'medium', or 'low'\n7. confidence_score: Your confidence in this analysis (0-100)\n8. key_pain_points: Array of specific pain points mentioned\n9. potential_solutions: Array of solution categories that might help\n10. follow_up_strategy: Recommended approach for engagement\n\nFocus on identifying genuine business problems related to customer retention, churn, ecommerce optimization, or growth challenges.",
+    "response_format": "json_object"
+  },
+  "engagement_generation_prompt": {
+    "system_prompt": "You are a helpful marketing consultant who provides valuable insights on Reddit. Your responses should be genuinely helpful, non-promotional, and focused on providing real value. Never directly pitch services or products.",
+    "user_prompt_template": "Generate a helpful Reddit comment for this classified post:\n\nPost Details:\nTitle: {title}\nContent: {content}\nSubreddit: {subreddit}\nClassification: {classification}\nSentiment: {sentiment}\nPain Points: {pain_points}\n\nRequirements:\n1. Be genuinely helpful and valuable\n2. Match Reddit's conversational tone\n3. Under 300 characters for initial engagement\n4. No direct promotion or sales pitches\n5. Focus on providing actionable advice\n6. Show expertise without being pushy\n7. Include a subtle mention of relevant experience if appropriate\n\nGenerate 3 response options:\n1. Conservative: Safe, helpful advice\n2. Engaging: More personal, builds rapport\n3. Expert: Demonstrates deeper knowledge\n\nProvide JSON response with:\n- conservative_response\n- engaging_response  \n- expert_response\n- recommended_option\n- engagement_strategy\n- follow_up_suggestions",
+    "response_format": "json_object"
+  },
+  "sentiment_analysis_prompt": {
+    "system_prompt": "You are a sentiment analysis expert focused on business and marketing contexts.",
+    "user_prompt_template": "Analyze the sentiment and emotion in this post:\n\n{content}\n\nProvide JSON response with:\n1. primary_sentiment: 'positive', 'negative', 'neutral'\n2. emotion_intensity: 1-10 scale\n3. specific_emotions: Array of detected emotions\n4. frustration_level: 1-10 scale\n5. urgency_level: 1-10 scale\n6. business_impact_sentiment: How they feel about their business situation\n7. receptivity_score: How likely they are to be receptive to help (1-10)",
+    "response_format": "json_object"
+  },
+  "topic_extraction_prompt": {
+    "system_prompt": "You are an expert at extracting business topics and themes from social media posts.",
+    "user_prompt_template": "Extract key business topics from this post:\n\n{content}\n\nProvide JSON response with:\n1. main_topics: Array of primary business topics\n2. sub_topics: Array of specific sub-categories  \n3. industry_vertical: Detected industry/vertical\n4. business_stage: 'startup', 'growth', 'established', 'enterprise'\n5. problem_category: Type of business challenge\n6. solution_category: Type of solution they might need\n7. technical_level: 'beginner', 'intermediate', 'advanced'\n8. budget_indicators: Any mentions of budget/cost concerns",
+    "response_format": "json_object"
+  },
+  "quality_assessment_prompt": {
+    "system_prompt": "You assess the quality and authenticity of social media posts for business engagement purposes.",
+    "user_prompt_template": "Assess this post for engagement quality:\n\n{content}\n\nProvide JSON response with:\n1. authenticity_score: 1-10 (is this a genuine post?)\n2. engagement_potential: 1-10 (likelihood of meaningful conversation)\n3. spam_probability: 1-10 (likelihood this is spam/promotion)\n4. discussion_quality: 1-10 (quality of potential discussion)\n5. red_flags: Array of concerning elements\n6. positive_indicators: Array of good engagement signals\n7. recommended_action: 'engage', 'monitor', 'skip'\n8. risk_level: 'low', 'medium', 'high'",
+    "response_format": "json_object"
+  },
+  "competitive_analysis_prompt": {
+    "system_prompt": "You analyze posts for competitive intelligence and market positioning opportunities.",
+    "user_prompt_template": "Analyze this post for competitive insights:\n\n{content}\n\nProvide JSON response with:\n1. competitor_mentions: Array of competitors mentioned\n2. solution_gaps: Areas where current solutions fall short\n3. market_opportunities: Potential opportunities identified\n4. positioning_angle: How to position our expertise\n5. differentiation_points: Key areas where we could differentiate\n6. market_sentiment: Overall sentiment toward existing solutions\n7. timing_opportunity: 'immediate', 'near_term', 'long_term'\n8. strategic_value: 1-10 for strategic importance",
+    "response_format": "json_object"
+  },
+  "prompt_settings": {
+    "provider": "claude",
+    "max_tokens": 4000,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "timeout_seconds": 30,
+    "retry_attempts": 3,
+    "retry_delay_seconds": 2,
+    "provider_configs": {
+      "claude": {
+        "model": "claude-3-5-sonnet-20241022",
+        "max_tokens": 4000,
+        "fallback_model": "claude-3-haiku-20240307"
+      },
+      "openai": {
+        "model": "gpt-4-turbo-preview", 
+        "max_tokens": 1000,
+        "fallback_model": "gpt-3.5-turbo-16k",
+        "frequency_penalty": 0.1,
+        "presence_penalty": 0.1
+      },
+      "groq": {
+        "model": "llama-3.1-70b-versatile",
+        "max_tokens": 2000,
+        "fallback_model": "llama-3.1-8b-instant"
+      },
+      "together": {
+        "model": "meta-llama/Llama-3-70b-chat-hf",
+        "max_tokens": 2000,
+        "fallback_model": "meta-llama/Llama-3-8b-chat-hf"
+      },
+      "ollama": {
+        "model": "llama3.1:70b",
+        "max_tokens": 2000,
+        "fallback_model": "llama3.1:8b"
+      },
+      "huggingface": {
+        "model": "meta-llama/Llama-3.1-70B-Instruct",
+        "max_tokens": 2000,
+        "fallback_model": "meta-llama/Llama-3.1-8B-Instruct"
+      }
+    }
+  },
+  "validation_rules": {
+    "required_fields": [
+      "relevance_score",
+      "intent_classification", 
+      "sentiment",
+      "engagement_recommendation",
+      "confidence_score"
+    ],
+    "score_ranges": {
+      "relevance_score": [0, 100],
+      "confidence_score": [0, 100],
+      "priority_level": ["high", "medium", "low"],
+      "intent_classification": ["question", "complaint", "vendor_search", "discussion", "showcase", "other"],
+      "sentiment": ["positive", "negative", "neutral", "frustrated"],
+      "engagement_recommendation": ["direct_reply", "direct_message", "monitor", "skip"]
+    }
+  }
+}

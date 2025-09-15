@@ -1,0 +1,400 @@
+{
+  "name": "Reddit GTM Monitor - Google AI",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "9f6a1868-0487-4987-94e4-b88a919305ac",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2576,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/{{ $env.REDDIT_SUBREDDIT || 'entrepreneur+startups+ecommerce+shopify+marketing' }}/new.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "{{ $env.REDDIT_USER_AGENT || 'GTM-Monitor/1.0' }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ $env.REDDIT_AUTH }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "d83a8605-2d70-4cc4-bb0b-02f685a0c070",
+      "name": "Fetch Reddit Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -2352,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Load keywords configuration\nconst keywords = {\n  \"primary\": [\n    \"customer retention\", \"churn reduction\", \"customer lifetime value\", \"clv\", \"ltv\",\n    \"shopify growth\", \"shopify store\", \"ecommerce growth\", \"store optimization\",\n    \"email marketing\", \"abandoned cart\", \"cart abandonment\", \"win back\", \"winback\",\n    \"loyalty program\", \"repeat customers\", \"customer engagement\", \"retention strategy\",\n    \"subscription business\", \"recurring revenue\", \"customer success\", \"onboarding\",\n    \"startup\", \"leads\", \"crm\", \"hubspot\", \"sales\", \"automation\", \"ai agent\", \"qualify\"\n  ],\n  \"semantic_groups\": {\n    \"retention_pain\": [\"losing customers\", \"customers leaving\", \"high churn\", \"low retention\", \"customers not coming back\"],\n    \"growth_challenges\": [\"plateau\", \"stagnant growth\", \"declining sales\", \"need more revenue\", \"struggling to grow\"],\n    \"email_issues\": [\"low open rates\", \"email not working\", \"poor email performance\", \"email automation\"],\n    \"conversion_problems\": [\"low conversion\", \"visitors not buying\", \"traffic not converting\", \"abandoned carts\"]\n  },\n  \"negative_keywords\": [\"looking for job\", \"hiring\", \"recruitment\", \"spam\", \"scam\"]\n};\n\nconst posts = $json.data?.children || [];\nconst relevantPosts = [];\n\nfor (const post of posts) {\n  const postData = post.data;\n  const title = (postData.title || '').toLowerCase();\n  const content = (postData.selftext || '').toLowerCase();\n  const combinedText = `${title} ${content}`;\n  \n  // Check for negative keywords first\n  const hasNegativeKeywords = keywords.negative_keywords.some(neg => \n    combinedText.includes(neg.toLowerCase())\n  );\n  \n  if (hasNegativeKeywords) continue;\n  \n  // Check for primary keywords\n  const matchedKeywords = [];\n  \n  for (const keyword of keywords.primary) {\n    if (combinedText.includes(keyword.toLowerCase())) {\n      matchedKeywords.push(keyword);\n    }\n  }\n  \n  // Check semantic groups\n  for (const [group, groupKeywords] of Object.entries(keywords.semantic_groups)) {\n    for (const keyword of groupKeywords) {\n      if (combinedText.includes(keyword.toLowerCase())) {\n        matchedKeywords.push(`${group}:${keyword}`);\n      }\n    }\n  }\n  \n  // If matches found, add to relevant posts\n  if (matchedKeywords.length > 0) {\n    relevantPosts.push({\n      id: postData.id,\n      title: postData.title,\n      content: postData.selftext || '',\n      url: `https://reddit.com${postData.permalink}`,\n      author: postData.author,\n      subreddit: postData.subreddit,\n      upvotes: postData.ups || 0,\n      comments: postData.num_comments || 0,\n      created: new Date(postData.created_utc * 1000).toISOString(),\n      matched_keywords: matchedKeywords\n    });\n  }\n}\n\nconsole.log(`Found ${relevantPosts.length} relevant posts out of ${posts.length} total posts`);\nconsole.log('Processed posts details:');\nfor (let i = 0; i < Math.min(3, posts.length); i++) {\n  const post = posts[i];\n  if (post && post.data) {\n    const title = (post.data.title || '').toLowerCase();\n    const content = (post.data.selftext || '').toLowerCase();\n    console.log(`Post ${i + 1}: \"${post.data.title}\" - Content: \"${content.substring(0, 100)}...\"`);\n  }\n}\n\n// For n8n Code node: return multiple items by using the special format\nif (relevantPosts.length === 0) {\n  return [];\n}\n\n// Return as separate items for n8n\nconst items = [];\nfor (const post of relevantPosts) {\n  items.push({ json: post });\n}\n\nreturn items;"
+      },
+      "id": "4a1dc6d1-fe70-47f8-8c5a-1ca52f05b75f",
+      "name": "Filter Relevant Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2112,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Make Google AI API call with post data\nconst items = [];\n\nfor (const item of $input.all()) {\n  const postData = item.json;\n\n  // Clean post content to avoid JSON issues\n  const cleanTitle = (postData.title || '').replace(/[\"\\r\\n\\t]/g, ' ').substring(0, 200);\n  const cleanContent = (postData.content || '').replace(/[\"\\r\\n\\t]/g, ' ').substring(0, 500);\n\n  // Build the prompt with actual post data\n  const prompt = `Analyze this Reddit post and return ONLY valid JSON with these exact fields:\n\n  REQUIRED OUTPUT FORMAT:\n  {\n    \"relevance_score\": 75,\n    \"intent_classification\": \"discussion\",\n    \"sentiment\": \"neutral\",\n    \"business_context\": \"analysis\",\n    \"engagement_recommendation\": \"monitor\",\n    \"priority_level\": \"medium\",\n    \"confidence_score\": 80,\n    \"key_pain_points\": [\"pain point 1\", \"pain point 2\"],\n    \"potential_solutions\": [\"solution 1\", \"solution 2\"],\n    \"follow_up_strategy\": \"example\"\n  }\n\n  IMPORTANT:\n  - key_pain_points must be a JSON array of strings, NOT comma-separated text\n  - potential_solutions must be a JSON array of strings, NOT comma-separated text\n  - Return only the JSON object, no additional text or markdown\n  - All string values must be in quotes\n\nPost Title: ${cleanTitle}\nContent: ${cleanContent}\nSubreddit: r/${postData.subreddit || 'unknown'}\nUpvotes: ${postData.upvotes || 0}\nComments: ${postData.comments || 0}`;\n\n  // Make the API call using this.helpers.httpRequest\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'POST',\n      url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_AI_API_KEY}`,\n      headers: {\n        'Content-Type': 'application/json'\n      },\n      body: JSON.stringify({\n        generationConfig: {\n          temperature: 0.7,\n          maxOutputTokens: 1000\n        },\n        contents: [{\n          parts: [{\n            text: prompt\n          }]\n        }]\n      })\n    });\n\n    console.log('Google AI Response:', JSON.stringify(response, null, 2));\n    items.push({ json: response });\n    \n  } catch (error) {\n    console.log('API Error:', error);\n    // Return fallback response\n    items.push({ json: {\n      candidates: [{\n        content: {\n          parts: [{\n            text: '{\"relevance_score\": 50, \"intent_classification\": \"other\", \"sentiment\": \"neutral\", \"business_context\": \"API error\", \"engagement_recommendation\": \"monitor\", \"priority_level\": \"low\", \"confidence_score\": 30, \"key_pain_points\": [\"API unavailable\"], \"potential_solutions\": [\"retry later\"], \"follow_up_strategy\": \"manual review\"}'\n          }]\n        }\n      }]\n    }});\n  }\n}\n\nreturn items;"
+      },
+      "id": "a204ffd7-1c22-40cd-9809-673946f82bbe",
+      "name": "Analyze with Google AI",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1680,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Google AI's response and combine with post data\nconst postData = $('Filter Relevant Posts').item.json;\nconst googleResponse = $json.candidates && $json.candidates[0] && $json.candidates[0].content && $json.candidates[0].content.parts && $json.candidates[0].content.parts[0] ? $json.candidates[0].content.parts[0].text : '';\n\n// Try to parse Google AI's JSON response\nlet analysis;\ntry {\n  // Try to extract JSON from the response\n  let jsonText = googleResponse;\n  \n  // Remove markdown code blocks if present\n  const jsonMatch = googleResponse.match(/```(?:json)?\\s*([\\s\\S]*?)\\s*```/);\n  if (jsonMatch) {\n    jsonText = jsonMatch[1];\n  }\n  \n  // Try to find JSON object in the text\n  const objectMatch = jsonText.match(/\\{[\\s\\S]*\\}/);\n  if (objectMatch) {\n    jsonText = objectMatch[0];\n  }\n  \n  analysis = JSON.parse(jsonText);\n  \n  // Validate required fields\n  if (!analysis.relevance_score) analysis.relevance_score = 50;\n  if (!analysis.intent_classification) analysis.intent_classification = 'other';\n  if (!analysis.sentiment) analysis.sentiment = 'neutral';\n  if (!analysis.business_context) analysis.business_context = 'Analysis completed';\n  if (!analysis.engagement_recommendation) analysis.engagement_recommendation = 'monitor';\n  if (!analysis.priority_level) analysis.priority_level = 'low';\n  if (!analysis.confidence_score) analysis.confidence_score = 60;\n  if (!analysis.key_pain_points) analysis.key_pain_points = [];\n  if (!analysis.potential_solutions) analysis.potential_solutions = [];\n  if (!analysis.follow_up_strategy) analysis.follow_up_strategy = 'Review and assess';\n  \n} catch (error) {\n  console.log(`Failed to parse Google AI response: ${error.message}`);\n  console.log(`Raw response: ${googleResponse}`);\n  \n  // Fallback analysis\n  analysis = {\n    relevance_score: 40,\n    intent_classification: 'other',\n    sentiment: 'neutral',\n    business_context: `Parsing error: ${error.message}`,\n    engagement_recommendation: 'monitor',\n    priority_level: 'low',\n    confidence_score: 20,\n    key_pain_points: [],\n    potential_solutions: [],\n    follow_up_strategy: 'Review manually due to parsing error'\n  };\n}\n\n// Combine post data with analysis\nconst result = {\n  // Original post data\n  post_id: postData.id,\n  title: postData.title,\n  content: postData.content,\n  url: postData.url,\n  author: postData.author,\n  subreddit: postData.subreddit,\n  upvotes: postData.upvotes,\n  comments: postData.comments,\n  created: postData.created,\n  matched_keywords: postData.matched_keywords,\n  \n  // AI Analysis\n  relevance_score: parseInt(analysis.relevance_score) || 0,\n  intent_classification: analysis.intent_classification || 'other',\n  sentiment: analysis.sentiment || 'neutral',\n  business_context: analysis.business_context || '',\n  engagement_recommendation: analysis.engagement_recommendation || 'monitor',\n  priority_level: analysis.priority_level || 'low',\n  confidence_score: parseInt(analysis.confidence_score) || 0,\n  key_pain_points: Array.isArray(analysis.key_pain_points) ? analysis.key_pain_points :\n    (typeof analysis.key_pain_points === 'string' ? analysis.key_pain_points.split(',').map(s => s.trim()) : []),\n  potential_solutions: Array.isArray(analysis.potential_solutions) ? analysis.potential_solutions :\n    (typeof analysis.potential_solutions === 'string' ? analysis.potential_solutions.split(',').map(s => s.trim()) : []),\n  follow_up_strategy: analysis.follow_up_strategy || '',\n  \n  // Metadata\n  analyzed_at: new Date().toISOString(),\n  ai_provider: 'gemini-1.5-flash'\n};\n\nconsole.log(`Analyzed post: ${result.title} - Relevance: ${result.relevance_score}`);\n\nreturn { json: result };"
+      },
+      "id": "23cd4659-f5c2-4a46-bdcb-a9fe4455af19",
+      "name": "Process Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1456,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition_1",
+              "leftValue": "={{ $json.relevance_score }}",
+              "rightValue": "={{ parseInt($env.HIGH_PRIORITY_THRESHOLD) || 70 }}",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "condition_2",
+              "leftValue": "={{ $json.confidence_score }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fb9d276c-edd3-4e2f-a958-0a47a2ece8ae",
+      "name": "High Priority Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1232,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send Slack notification\nconst items = [];\n\nfor (const item of $input.all()) {\n  const postData = item.json;\n  \n  // Build Slack message\n  const message = {\n    text: `🚨 High Priority GTM Opportunity Detected`,\n    attachments: [{\n      color: \"good\",\n      fields: [\n        {\n          title: \"Post Title\",\n          value: postData.title || 'No title',\n          short: false\n        },\n        {\n          title: \"Subreddit\",\n          value: `r/${postData.subreddit || 'unknown'}`,\n          short: true\n        },\n        {\n          title: \"Author\",\n          value: `u/${postData.author || 'unknown'}`,\n          short: true\n        },\n        {\n          title: \"Relevance Score\",\n          value: `${postData.relevance_score || 0}/100`,\n          short: true\n        },\n        {\n          title: \"Priority\",\n          value: postData.priority_level || 'unknown',\n          short: true\n        }\n      ],\n      actions: [{\n        type: \"button\",\n        text: \"View Post\",\n        url: postData.url || '#'\n      }]\n    }]\n  };\n\n  // Send to Slack\n  try {\n    const response = await this.helpers.httpRequest({\n      method: 'POST',\n      url: process.env.SLACK_WEBHOOK_URL,\n      headers: {\n        'Content-Type': 'application/json'\n      },\n      body: JSON.stringify(message)\n    });\n    \n    console.log('Slack notification sent successfully');\n    items.push({ json: { success: true, response: response } });\n    \n  } catch (error) {\n    console.log('Slack notification failed:', error);\n    items.push({ json: { success: false, error: error.message } });\n  }\n}\n\nreturn items;"
+      },
+      "id": "7a8587d5-f81f-4e09-899c-949024d67b09",
+      "name": "Send Slack Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "value": "public",
+          "mode": "list"
+        },
+        "table": {
+          "__rl": true,
+          "value": "gtm_opportunities",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $json.post_id }}",
+            "title": "={{ $json.title }}",
+            "content": "={{ $json.content }}",
+            "url": "={{ $json.url }}",
+            "author": "={{ $json.author }}",
+            "subreddit": "={{ $json.subreddit }}",
+            "upvotes": "={{ $json.upvotes }}",
+            "comments": "={{ $json.comments }}",
+            "created_at": "={{ $json.created }}",
+            "relevance_score": "={{ $json.relevance_score }}",
+            "intent_classification": "={{ $json.intent_classification }}",
+            "sentiment": "={{ $json.sentiment }}",
+            "business_context": "={{ $json.business_context }}",
+            "engagement_recommendation": "={{ $json.engagement_recommendation }}",
+            "priority_level": "={{ $json.priority_level }}",
+            "confidence_score": "={{ $json.confidence_score }}",
+            "follow_up_strategy": "={{ $json.follow_up_strategy }}",
+            "analyzed_at": "={{ $json.analyzed_at }}",
+            "ai_provider": "={{ $json.ai_provider }}",
+            "status": "new"
+          },
+          "matchingColumns": [
+            "post_id"
+          ]
+        },
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "id": "9b727a98-d77e-4892-90c7-099f53bfc43b",
+      "name": "Store in Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [
+        -1008,
+        128
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "MYkojvtSNuJL31MN",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1GQlkuXFIl4Kevv9BWTFePX6gC2UX99e4fB9ysvPPy9w",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "GTM_Data",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ new Date().toISOString() }}",
+            "Platform": "Reddit",
+            "Post URL": "={{ $json.url }}",
+            "Title": "={{ $json.title }}",
+            "Author": "={{ $json.author }}",
+            "Subreddit": "r/={{ $json.subreddit }}",
+            "Upvotes": "={{ $json.upvotes }}",
+            "Comments": "={{ $json.comments }}",
+            "Content Preview": "={{ $json.content ? $json.content.substring(0, 200) + '...' : '' }}",
+            "Relevance Score": "={{ $json.relevance_score }}",
+            "Intent": "={{ $json.intent_classification }}",
+            "Sentiment": "={{ $json.sentiment }}",
+            "Business Context": "={{ $json.business_context }}",
+            "Engagement Recommendation": "={{ $json.engagement_recommendation }}",
+            "Priority": "={{ $json.priority_level }}",
+            "Confidence": "={{ $json.confidence_score }}",
+            "Follow-up Strategy": "={{ $json.follow_up_strategy }}",
+            "AI Provider": "={{ $json.ai_provider }}",
+            "Status": "New"
+          },
+          "matchingColumns": [
+            "Post URL"
+          ]
+        },
+        "options": {
+          "createSheet": true
+        }
+      },
+      "id": "fefe2b1e-7f3d-489f-b29e-352ee7eb88c1",
+      "name": "Store in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        -1008,
+        320
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "VoacEp4nykkP3XXv",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "015e0bf4-e145-4aec-8bbf-0e2e13dbe914",
+      "name": "Workflow Complete",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        16
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Reddit Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Reddit Posts": {
+      "main": [
+        [
+          {
+            "node": "Filter Relevant Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Relevant Posts": {
+      "main": [
+        [
+          {
+            "node": "Analyze with Google AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze with Google AI": {
+      "main": [
+        [
+          {
+            "node": "Process Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Analysis": {
+      "main": [
+        [
+          {
+            "node": "High Priority Filter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Filter": {
+      "main": [
+        [
+          {
+            "node": "Send Slack Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Store in Database",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Store in Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Slack Alert": {
+      "main": [
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Database": {
+      "main": [
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Workflow Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

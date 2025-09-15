@@ -1,0 +1,49 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (normally would include .env, but keeping for demo)
+# .env
+
+# Docker volumes
+postgres_data/
+n8n_data/
+redis_data/
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+
+# Docker Compose override
+docker-compose.override.yml

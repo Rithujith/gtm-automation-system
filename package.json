@@ -1,0 +1,150 @@
+{
+  "name": "gtm-automation",
+  "version": "1.0.0",
+  "description": "Professional GTM automation system using n8n workflows for Reddit monitoring, AI classification, and engagement generation",
+  "main": "index.js",
+  "scripts": {
+    "start": "docker-compose up -d",
+    "stop": "docker-compose down",
+    "restart": "docker-compose restart",
+    "logs": "docker-compose logs -f",
+    "logs:n8n": "docker-compose logs -f n8n",
+    "logs:postgres": "docker-compose logs -f postgres",
+    "logs:redis": "docker-compose logs -f redis",
+    "backup": "node scripts/backup.js",
+    "restore": "node scripts/restore.js",
+    "setup": "node scripts/setup.js",
+    "health": "node scripts/health-check.js",
+    "import:workflows": "node scripts/import-workflows.js",
+    "export:workflows": "node scripts/export-workflows.js",
+    "validate:config": "node scripts/validate-config.js",
+    "setup:ai": "node scripts/setup-ai-provider.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --ext .js,.json",
+    "lint:fix": "eslint . --ext .js,.json --fix",
+    "format": "prettier --write .",
+    "dev": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml up",
+    "prod": "docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d"
+  },
+  "keywords": [
+    "gtm",
+    "automation",
+    "n8n",
+    "reddit",
+    "linkedin", 
+    "ai",
+    "openai",
+    "classification",
+    "engagement",
+    "marketing",
+    "lead-generation",
+    "workflow-automation"
+  ],
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/gtm-automation.git"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.3",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "pg": "^8.11.3",
+    "redis": "^4.6.10",
+    "googleapis": "^128.0.0",
+    "@anthropic-ai/sdk": "^0.24.3",
+    "openai": "^4.20.1",
+    "groq-sdk": "^0.5.0",
+    "@slack/web-api": "^6.10.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "helmet": "^7.1.0",
+    "rate-limiter-flexible": "^4.0.1",
+    "uuid": "^9.0.1",
+    "csv-writer": "^1.6.0",
+    "nodemailer": "^6.9.7",
+    "aws-sdk": "^2.1489.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jest": "^27.6.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
+    "nodemon": "^3.0.1",
+    "@types/node": "^20.9.0",
+    "typescript": "^5.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "*.{js,json}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm test"
+    }
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "scripts/**/*.js",
+      "!scripts/test/**/*.js",
+      "!**/node_modules/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "prettier"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "rules": {
+      "no-console": "warn",
+      "no-unused-vars": "error",
+      "prefer-const": "error"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 80,
+    "tabWidth": 2
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "primary_keywords": {
+    "customer_retention": {
+      "keywords": [
+        "customer retention",
+        "churn reduction", 
+        "customer churn",
+        "reduce churn",
+        "retain customers",
+        "customer loyalty",
+        "customer lifetime value",
+        "CLV",
+        "LTV",
+        "customer success"
+      ],
+      "weight": 10,
+      "priority": "high"
+    },
+    "shopify_growth": {
+      "keywords": [
+        "shopify growth",
+        "shopify store",
+        "ecommerce growth",
+        "shopify sales",
+        "shopify marketing",
+        "shopify optimization",
+        "convert visitors",
+        "increase conversions",
+        "abandoned cart"
+      ],
+      "weight": 9,
+      "priority": "high"
+    },
+    "business_problems": {
+      "keywords": [
+        "losing customers",
+        "customers leaving",
+        "low retention",
+        "high churn",
+        "need help with",
+        "struggling with",
+        "how to improve",
+        "best practices",
+        "recommendations"
+      ],
+      "weight": 8,
+      "priority": "medium"
+    },
+    "saas_metrics": {
+      "keywords": [
+        "saas metrics",
+        "mrr",
+        "arr",
+        "monthly recurring revenue",
+        "annual recurring revenue",
+        "cohort analysis",
+        "retention rate",
+        "churn rate",
+        "nps score",
+        "customer satisfaction"
+      ],
+      "weight": 7,
+      "priority": "medium"
+    },
+    "marketing_automation": {
+      "keywords": [
+        "marketing automation",
+        "email marketing",
+        "lifecycle marketing",
+        "onboarding flow",
+        "drip campaigns",
+        "segmentation",
+        "personalization",
+        "behavioral triggers"
+      ],
+      "weight": 6,
+      "priority": "low"
+    }
+  },
+  "semantic_groups": {
+    "pain_indicators": [
+      "help",
+      "stuck",
+      "struggling",
+      "frustrated",
+      "difficult",
+      "challenge",
+      "problem",
+      "issue",
+      "trouble"
+    ],
+    "solution_seeking": [
+      "how to",
+      "best way",
+      "recommendations",
+      "advice",
+      "tips",
+      "strategies",
+      "tools",
+      "software",
+      "platform",
+      "service"
+    ],
+    "urgency_indicators": [
+      "urgent",
+      "asap",
+      "quickly",
+      "fast",
+      "immediately",
+      "critical",
+      "emergency",
+      "deadline"
+    ]
+  },
+  "negative_keywords": [
+    "spam",
+    "scam",
+    "fake",
+    "illegal",
+    "hacking",
+    "crack",
+    "pirated",
+    "free download",
+    "get rich quick",
+    "multilevel marketing",
+    "mlm",
+    "pyramid scheme",
+    "adult content",
+    "nsfw",
+    "politics",
+    "religion",
+    "controversial"
+  ],
+  "competitor_keywords": [
+    "hubspot",
+    "salesforce",
+    "marketo",
+    "pardot",
+    "klaviyo",
+    "mailchimp",
+    "constant contact",
+    "sendinblue",
+    "convertkit"
+  ],
+  "quality_filters": {
+    "min_word_count": 10,
+    "min_upvotes": 1,
+    "min_comment_count": 0,
+    "exclude_deleted": true,
+    "exclude_removed": true,
+    "max_age_days": 7
+  }
+}
